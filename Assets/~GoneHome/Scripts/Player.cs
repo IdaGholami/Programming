@@ -6,8 +6,9 @@ namespace GoneHome
 {
     public class Player : MonoBehaviour
     {
-        public float movementSpeed = 10f;
-       
+        public float acceleration = 10f;
+        public float maxVelocity = 10f;
+
         private Rigidbody rigid;
 
         // Use this for initialization
@@ -24,11 +25,19 @@ namespace GoneHome
 
             Vector3 inputDir = new Vector3(inputH, 0, inputV);
 
-            Vector3 position = transform.position;
+            Transform cam = Camera.main.transform;
 
-            position += inputDir * movementSpeed * Time.deltaTime;
 
-            rigid.MovePosition(position);
+            rigid.AddForce(inputDir * acceleration);
+
+            Vector3 vel = rigid.velocity; 
+
+            if (vel.magnitude > maxVelocity)
+            {
+                vel = vel.normalized * maxVelocity;
+            }
+
+            rigid.velocity = vel; 
         }
     }
 } 
