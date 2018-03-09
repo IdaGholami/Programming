@@ -18,11 +18,15 @@ namespace GoneHome
         }
         public void ResetLevel()
         {
+            FollowEnemy[] enemies = FindObjectsOfType<FollowEnemy>();
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                enemies[i].Reset();
+            }
 
-            Scene currentScene = SceneManager.GetActiveScene();
+            Player player = FindObjectOfType<Player>();
 
-            SceneManager.LoadScene(currentScene.buildIndex);
-
+            player.Reset();
         }
     }
 
