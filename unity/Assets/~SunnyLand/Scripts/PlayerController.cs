@@ -4,23 +4,21 @@ using UnityEngine;
 
 namespace SunnyLand
 {
-    [RequireComponent(typeof(SpriteRenderer))]
-    [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour
-    { 
-    public float speed = 5f;
+    {
+        public float speed = 5f;
         public int health = 100;
         public int damage = 50;
-        [Tooltip("The maximum speed a player can move.")]
         public float maxVelocity = 5f;
         public float maxSlopeAngle = 45f;
-        [Header("Grounding")]
-        public float raDistance = .25f;
+        [Header("Grounding")] // Attributes
+        public float rayDistance = .25f;
         public bool isGrounded = false;
         public bool isOnSlope = false;
         [Header("Crouch")]
         public bool isCrouching = false;
-        public float jumpingHeight = 2f;
+        [Header("Jump")]
+        public float jumpHeight = 2f;
         public int maxJumpCount = 2;
         public bool isJumping = false;
         [Header("Climb")]
@@ -31,6 +29,7 @@ namespace SunnyLand
         private int currentJump = 0;
         private float inputH, inputV;
 
+        // References
         private SpriteRenderer rend;
         private Rigidbody2D rigid;
 
@@ -41,12 +40,10 @@ namespace SunnyLand
             rend = GetComponent<SpriteRenderer>();
             rigid = GetComponent<Rigidbody2D>();
         }
-
         // Update is called once per frame
         void Update()
         {
-            PerformClimb();
-            PerformJump();
+            // Constantly update player mechanics
             PerformMove();
         }
         void FixedUpdate()
@@ -55,11 +52,19 @@ namespace SunnyLand
         }
         void OnDrawGizmos()
         {
-
+            // Draw the ground ray
+            Ray groundRay = new Ray(transform.position, Vector3.down);
+            Gizmos.DrawLine(groundRay.origin, groundRay.origin + groundRay.direction * rayDistance);
+            // Draw the 'right' direction
+            Vector3 right = Vector3.Cross(groundNormal, Vector3.forward);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position - right,
+                            transform.position + right);
         }
         #endregion
 
         #region Custom Functions
+        // Inputs
         public void Jump()
         {
 
@@ -74,10 +79,13 @@ namespace SunnyLand
         }
         public void Move(float horizontal)
         {
+            // If there is horizontal input
             if(horizontal != 0)
             {
+                // Flip the sprite based on input direction
                 rend.flipX = horizontal < 0;
             }
+            // Store the horizontal input for later
             inputH = horizontal;
         }
         public void Climb(float vertical)
@@ -88,21 +96,25 @@ namespace SunnyLand
         {
 
         }
-
-        void PerformMove()
-        {
-            Vector3 right = Vector3.Cross(groundNormal, Vector3.forward);
-            rigid.AddForce(right * inputH * speed);
-            LimitVelocity();
-        }
+        // Actions
         void PerformClimb()
         {
 
+        }
+        void PerformMove()
+        {
+            // Calculate 'right' depending on ground surface normal
+            Vector3 right = Vector3.Cross(groundNormal, Vector3.forward);
+            // Add force in the direction of horizontal movement
+            rigid.AddForce(right * inputH * speed);
+            // Limit the velocity
+            LimitVelocity();
         }
         void PerformJump()
         {
 
         }
+        // Detectors
         void DetectClimbable()
         {
 
@@ -119,14 +131,18 @@ namespace SunnyLand
         {
 
         }
-
+        // Helpers
         void LimitVelocity()
         {
+            // Copy current velocity to smaller variable name
             Vector3 vel = rigid.velocity;
-            if(vel.magnitude > maxVelocity)
+            // Check if velocity reached max vel
+            if (vel.magnitude > maxVelocity)
             {
+                // Cap the velocity
                 vel = vel.normalized * maxVelocity;
             }
+            // Overwrite old velocity
             rigid.velocity = vel;
         }
         void StopClimbing()
