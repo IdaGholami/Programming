@@ -20,6 +20,7 @@ public class Playercontroller : MonoBehaviour
         winText.text = "";
     }
 
+    // Grabbing input from the user and pushing the object
     void FixedUpdate ()
     {
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -43,9 +44,9 @@ public class Playercontroller : MonoBehaviour
     void SetCountText ()
     {
         countText.text = "Count:" + count.ToString();
-        if (count>= 12)
+        if (count>= 26)
         {
-            winText.text = "You can chill now" ;
+            winText.text = "You win!" ;
         }
     }
 }
